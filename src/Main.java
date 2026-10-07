@@ -4,12 +4,11 @@ import java.lang.reflect.Field;
 
 public class Main {
 
-    // ---------- ЗАПУСК ПРОГРАМИ ----------
     public static void main(String[] args) throws Exception {
         // Хороший користувач
-        User u1 = new User("Олена", "olena@mail.com", 25);
+        User u1 = new User("Даня", "Dania@mail.com", 25);
         // Поганий користувач: порожнє ім'я, email без @, вік 5
-        User u2 = new User("", "olenamail.com", 5);
+        User u2 = new User("", "DAniamail.com", 5);
         // Поганий товар: немає назви, ціна мінус, залишок дуже великий
         Product p1 = new Product(null, -10, 99999);
 
@@ -24,28 +23,26 @@ public class Main {
         System.out.println("Помилок: " + errors + ", попереджень: " + warnings);
     }
 
-    // Лічильники для звіту
+    // Лічильники
     static int errors = 0;
     static int warnings = 0;
 
     // ---------- ПЕРЕВІРКА ЧЕРЕЗ РЕФЛЕКСІЮ ----------
-    // Бере будь-який об'єкт, дивиться на його поля і на анотації над ними
     static void check(Object obj) throws Exception {
-        Field[] fields = obj.getClass().getDeclaredFields(); // усі поля класу
+        Field[] fields = obj.getClass().getDeclaredFields(); 
 
         for (Field f : fields) {
-            Object value = f.get(obj); // значення поля
+            Object value = f.get(obj);
 
-            // 1) Перевірка @Required: поле не має бути порожнім
+
             Required req = f.getAnnotation(Required.class);
             if (req != null) {
                 if (value == null || value.toString().isEmpty()) {
                     report(f.getName(), req.message(), req.warning());
-                    continue; // порожнє поле далі не перевіряємо
+                    continue; 
                 }
             }
 
-            // 2) Перевірка @Range: число має бути між min і max
             Range range = f.getAnnotation(Range.class);
             if (range != null && value != null) {
                 int number = (Integer) value;
@@ -54,7 +51,6 @@ public class Main {
                 }
             }
 
-            // 3) Перевірка @Format: текст має відповідати шаблону
             Format format = f.getAnnotation(Format.class);
             if (format != null && value != null) {
                 if (!value.toString().matches(format.regex())) {
@@ -64,7 +60,6 @@ public class Main {
         }
     }
 
-    // Друкує один рядок звіту і рахує його
     static void report(String field, String message, boolean isWarning) {
         if (isWarning) {
             warnings++;
@@ -77,12 +72,11 @@ public class Main {
 }
 
 // ---------- АНОТАЦІЇ ----------
-// RUNTIME = анотація «живе» під час роботи програми, тому її можна прочитати
 
 @Retention(RetentionPolicy.RUNTIME)
 @interface Required {
     String message() default "Поле обов'язкове";
-    boolean warning() default false; // false = помилка, true = попередження
+    boolean warning() default false
 }
 
 @Retention(RetentionPolicy.RUNTIME)
@@ -100,7 +94,7 @@ public class Main {
     boolean warning() default false;
 }
 
-// ---------- МОДЕЛІ (дані, які перевіряємо) ----------
+// ---------- МОДЕЛІ ----------
 
 class User {
     @Required(message = "Ім'я не може бути порожнім")
